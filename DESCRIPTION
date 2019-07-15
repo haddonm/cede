@@ -1,0 +1,30 @@
+Package: cede
+Type: Package
+Title: Functions for Fishery Data Exploration and CPUE Standardization
+Version: 0.0.6
+Date: 2019-07-16
+Author: Malcolm Haddon
+Maintainer: Malcolm Haddon <Malcolm.Haddon@gmail.com>
+Description: Facilitates the exploration of variation and patterns within 
+    fisheries data (Year, Catch, Effort, depth, vessel, etc), especially yearly 
+    patterns. It also includes
+    functions to produce sketch maps of fisheries data where Lat and Long data,
+    or other spatially explicit data, are available. Finally, there are 
+    functions for conducting different types of CPUE standardization that are 
+    there to act simply as a guide to what is possible.
+    Version 0.0.4 fixes minor bugs
+    Version 0.0.5 alters plotLand to include the option of using rgb colours.
+    This would allow for transparency in case you want to illustrate 
+    distributions on land or in rivers.
+Depends: R (>= 2.10)
+Imports: 
+    gamm4,
+    mgcv,
+    nlme
+License: GPL (>= 2)
+Encoding: UTF-8
+LazyData: TRUE
+RoxygenNote: 6.1.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
