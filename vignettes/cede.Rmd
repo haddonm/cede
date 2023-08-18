@@ -55,13 +55,14 @@ Once we have our data available for analysis it is often a good idea to find way
 For example, the seasonality of catches can be indicative of the typical behaviour of the fishery within a year.
 
 ```{r echo=TRUE}
-round(tapsum(sps,"catch_kg","Year","Month"),2)
+# tapply(sps$catch_kg,list(sps$Year,sps$Month),sum,na.rm=TRUE)
+round(tapsum(sps,"catch_kg","Year","Month",div=1000),2)
 ```
 
 Then we might examine the catch (or effort, or etc, etc) by zone where the zones are in sequence along the coast (or they would be if this was a real fisheries data).
 
 ```{r echo=TRUE}
-tapsum(sps,"catch_kg","Year","Zone")
+tapsum(sps,"catch_kg","Year","Zone",div=1000)
 ```
 
 We are not limited to summarizing catch but, for example could also look at the distribution of effort as total number of hours (note the change to the default value of div so that the total number of hours is not divided by 1000). By pointing the function call to a new object, in this case _effbyyr_, one can then plot the results.
@@ -97,7 +98,8 @@ __Figure 1.__ A plot of total effort by zone, showing that a visual illustration
 DayNight is another factor that can have large consequences for catches and catch rates. Check the description of the _sps_ data set using `?sps to see details concerning each field in the data.frame.
 
 ```{r echo=TRUE}
-tapsum(sps,"catch_kg","Year","DayNight")
+ # the div argument is redundant because 1000 is the default value, kg -> tonne
+tapsum(sps,"catch_kg","Year","DayNight",div=1000)
 ```
 
 One of the most influential factors within each fishery is the vessel doing the catching. Often this is also a reflection of the skipper of the vessel as well as the relative performance of the boat itself. If both skipper and vessel are available then use both. Nevertheless, it is often the case the vessel name is the only information available about the vessel's fishing power relative to other vessels (or divers, etc) in the fleet. It is possible to pay special attention to catch-per-vessel, although the following analysis is more general than that and can be applied to, for example, catch-by-month relative to Depth Category.
@@ -215,7 +217,7 @@ Since the advent of GPS and GPS plotters very many fishers use this equipment an
 leftlong <- 143.0;  rightlong <- 150.0
 uplat <- -40.0;  downlat <- -44.6
 plotaus(leftlong,rightlong,uplat,downlat,gridon=1.0)
-addpoints(sps,intitle="Location of Catches")
+addpoints(sps,intitle="Location of Catches",txtout=FALSE)
 plotLand(incol="blue")
 
 ```

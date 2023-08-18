@@ -1,8 +1,8 @@
 Package: cede
 Type: Package
 Title: Functions for Fishery Data Exploration and CPUE Standardization
-Version: 0.0.6
-Date: 2019-07-16
+Version: 0.0.7
+Date: 2023-08-18
 Author: Malcolm Haddon
 Maintainer: Malcolm Haddon <Malcolm.Haddon@gmail.com>
 Description: Facilitates the exploration of variation and patterns within 

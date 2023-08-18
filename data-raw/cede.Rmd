@@ -1,0 +1,227 @@
+---
+title: "cede"
+author: "Malcolm Haddon"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Data Exploration and CPUE Standardization}
+  %\VignetteEngine{rmarkdown::HTML}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE)
+options(knitr.kable.NA = "",
+        knitr.table.format = "pandoc")
+
+options("show.signif.stars"=FALSE,"stringsAsFactors"=FALSE,
+        "max.print"=50000,"width"=240)
+
+library(cede)
+suppressPackageStartupMessages(library(knitr))
+
+```
+
+
+
+## Catch Effort and Data Exploration
+
+When working with relatively minor commercial species the data available is typically less comprehensive than for species that might be considered to be the economic drivers of a fishery. Nevertheless, data exploration, perhaps through plotting up different variables and how they might change through the years, can often be informative about changes in any fishery for a particular species. The __cede__ R package (Catch Effort and Data Exploration) includes an array of functions that should assist with such data exploration. If a species' fishery includes CPUE data then plots of the distribution of catches, effort, and CPUE (perhaps as Log(CPUE)) can be helpful in the interpretation of such CPUE, especially if there is sufficient data to allow for CPUE standardization. __cede__ now includes various functions that can also assist with CPUE standaridzation. All these functions are described below with examples of their use. 
+
+## Data Exploration
+
+The main data set included with __cede__ is called _sps_ and contains typical fisheries data from a scalefish fishery. It is there mainly to assist with learning the operation of the different functions. Generally it would be better to use your own data but if you consider the _sps_ data set you will gain an understanding of a typical format.
+
+```{r spscontents, echo=TRUE }
+
+data(sps)
+head(sps)
+properties(sps)
+```
+
+The _properties_ function categorizes the contents of a data.frame, counting the number of NAs in each variable, if any, listing their class, their minimum and maximum (if applicable) and finally printing an example of the contents. I find this function quite useful when beginning to use a different data.frame. Generally I refer to variables within a data.frame by their names so it is important to know if they are capitalized or not as well as knowing exactly which variables are present.
+
+Once we have our data available for analysis it is often a good idea to find ways to summarize how they vary realtive to one another. With fisheries data it is common to want to know how different factors influence the total catch and whether these vary by year. Typically one might use the R function _tapply_ to conduct such examinations. To simplify this use one can use the _tapsum_ function from within __cede__.
+
+
+The seasonality of catches can be indicative of the typical behaviour of the fishery within a year.
+
+```{r echo=TRUE}
+round(tapsum(sps,"catch_kg","Year","Month"),2)
+```
+
+Here we have examined the catch by zone where the zones are in sequence along the coast (or they would be if this was a real fisheries data).
+
+```{r echo=TRUE}
+tapsum(sps,"catch_kg","Year","Zone")
+```
+
+DayNight is another factor that can have large consequences for catches and catch rates. Check the description of the _sps_ data set using `?sps
+
+```{r echo=TRUE}
+tapsum(sps,"catch_kg","Year","DayNight")
+```
+
+One of the most influential factors withineach fishery is the vessel doing the catching. Often this is also a reflection of the skipper of the vessel as well as the relative performance of the boat itself. Nevertheless, it is often the case the only information available about the vessel's relative fishing power. It is possible to pay special attention to catch-per-vessel, although the following analysis is more general than that and can be applied to, for example, catch-by-Month relative to Depth Category.
+
+```{r catchbyvessel, echo=TRUE}
+cbv <- tapsum(sps,"catch_kg","Vessel","Year") # often more vessels than years
+total <- rowSums(cbv,na.rm=TRUE)
+cbv1 <- cbv[order(total),]   # sort by total catch
+round(cbv1,2)
+
+```
+
+Obviously some vessels will be much more influential than others simply because they catch a great deal more than others and hence introduce many more records into the database.
+
+
+```{r yeasrbubble, fig.width=7,fig.height=5,fig.align="center"}
+# plotprep(width=8,height=6) # not needed in the vignette
+to <- turnover(cbv1)
+yearBubble(cbv1,ylabel="sqrt(catch-per-vessel)",diam=0.125,txt=c(2,3,4,5),
+           hline=TRUE)
+
+```
+
+__Figure 1.__ This hypothetical fishery is clearly dominated by four or five vessels with numerous minor players. Additionally, before 2007 there were a few more productive fishers present (this reflects the structural adjustment in the Commonwealth from which this simulated data derives). The optional horizontal lines merely delineate the individual vessels. The top two rows of numbers is the total catch per year and the bottom row of numbers is the number of vessels reporting in each year.
+
+It is likely that if the data from the bottom nine vessels were omitted there would be no effect on any results as their catches are so minor in a relative sense. It is clear those vessels are merely casual occurrences within the fishery.
+
+While the main vessels were reasonably consistent in terms of reporting from this fishery other vessels came and went. To summarize such activity one can use the _turnover_ function which sumarizes the year-to-year changes in which vessels report being active.
+
+```{r echo = TRUE}
+print(to)
+```
+
+The Continue column lists how many continued from the preceding year, the Leavecolumn designates how many left relative to the previous year, while the Start column is literally how many started reporting in that year. The Total is the total reporting in each year. No attempt is made to follow individual vessels.
+
+### The Addition of CPUE data
+
+You will have notices that the data came with catch and effort but not CPUE, so we need to calculate that. In the following I test for the presence of zeros in the catch and effort to avoid generating errors of division (divide by zero errors will stop the analysis) and when taking logs. While we are adding CPUE we can also group the depth data into depth classes to provide that option when standardizing the CPUE data.
+
+```{r includeCPUE, echo=TRUE}
+sps$CE <- NA     # make space in the data.frame
+sps$LnCE <- NA
+pick <- which((sps$catch_kg > 0) & (sps$Effort > 0))
+sps$CE[pick] <- sps$catch_kg[pick]/sps$Effort[pick]
+sps$LnCE[pick] <- log(sps$CE)   # natural log-transformation
+# categorize Depth
+range(sps$Depth,na.tm=TRUE)     # to aid selection of depth class width
+sps$DepCat <- NA
+sps$DepCat <- trunc(sps$Depth/25) * 25
+table(sps$DepCat)
+
+```
+
+
+It is clear that most of the fishing occurs in waters of 150 meters or less.
+
+Tables of numbers are very informative but sometimes it is much easier to gain a visual impression of patterns in one's data by plotting them. Typically, with fisheries data, one might plot each variable, such as catch, effort, log(CPUE), depth, etc, by year to see whether changes have occurred through time. Such changes might adversely affect any analysis applied so it is always a good idea to examine (explore) one's data before using it. __cede__ provides a function _histyear_ that an plot a histogram of a selected variable by year.
+
+```{r cebyyr, echo=TRUE, fig.width=7,fig.height=6,fig.align="center"}
+
+outH <- histyear(sps,Lbound=-1.75,Rbound=8.5,inc=0.25,pickvar="LnCE",years="Year",
+         varlabel="log(CPUE)",plots=c(4,3))
+
+```
+
+__Figure 2.__ The distribution of the log(CPUE) each year for which data is available. The green lines are fitted normal distributions there for reference (log-transformation should normalize log-normal data).
+
+
+```{r depthbyyr, echo=TRUE, fig.width=7,fig.height=6,fig.align="center"}
+
+outH <- histyear(sps,Lbound=0,Rbound=375,inc=12.5,pickvar="Depth",years="Year",
+                 varlabel="Depth (m)",plots=c(4,3),vline=120)
+
+```
+
+__Figure 3.__ The distribution of reported mean depth of fishing each year. The green lines are fitted normal distributions there for reference, the blue lines are merely reference lines to ease comparisons between years.
+
+
+
+```{r depthbyyr, echo=TRUE, fig.width=7,fig.height=6,fig.align="center"}
+
+outH <- histyear(sps,Lbound=0,Rbound=10,inc=0.25,pickvar="Effort",years="Year",
+                 varlabel="Effort (Hrs)",plots=c(4,3),vline=NA)
+
+```
+
+__Figure 4.__ The distribution of reported Effort each year. The green lines are fitted normal distributions there for reference. Note the spikes of reporting four hours.
+
+
+Spikes can be seen in each of the graphs and the question needs to arise whether this is due to rounding by the fishers or is a real phenomenon. In fact, unless dealing with counts of fish caught (quite possible in some fisheries) then rounding invariably occurs when estimating catches but also in effort.
+
+```{r catchvseffort, fig.widtth=7,fig.height=5,fig.align="center"}
+par(mfrow=c(1,1),mai=c(0.45,0.45,0.05,0.05)) 
+par(cex=0.85, mgp=c(1.35,0.35,0), font.axis=7,font=7,font.lab=7)  
+plot(sps$Effort,sps$catch_kg,type="p",pch=16,col=rgb(1,0,0,1/5),ylim=c(0,500),
+     xlab="Effort (Hrs)",ylab="Catch (Kg)")
+abline(h=0.0,col="grey")
+
+```
+
+__Figure 5.__ A plot of catch against effort for each record in the _sps_ data.frame. The catch axis has been truncated at 500 kg so as to allow the rounding of catches to be less compressed and more visually obvious. It should be clear there is rounding at every half hour between 2 - 6 hours. In addition, there is rounding at about 30 kg steps from 30 - 300 kg, with other categories above that. The 30-33kg rounding reflects a belief that a standard fish bin contains about 30-33Kg of fish.
+
+
+The uneven grid like nature of the catch and effort data is reflected in the CPUE data, which might make one skeptical about the notion of a predictive model attempting to predict such values. While the residuals that are the basis of th statistical model fitting might be smoother in their distribution they do derive from a comparison of smooth predicted values with the grouped observed values, so any results are likely to be uncertain and to under-estimate any inherent variation.
+
+Despite such problems it is possible to derive useful information from fisheries data. It is generally recognized that fisheries data in general is noisy and potentially contains many errors, especially when considering the less important species that fall into the data-poor category. Neverntheless, the challenge remains of attempting to obtain useful and useable information from analysing such data.
+
+### Plotting Sketch Maps of Lat-Long data
+
+Since the advent of GPS and GPS plotters very many fishers use there equipment and fisheries departments have started to ask for precise location data accordingly. If such latitude and longitude data are available it is often informative to plot such data as a literal map to illustrate the focus and range of a fishery. __cede__ also provides the capacity to generate such sketch maps instead of using a full GIS. The idea here is not to conduct detailed spatial analyses, for which a GIS is better suited. Instead the idea is simply to gain a rapid impression of the operation of a fishery. Of course, care needs to be taken with such plots as they very obviously contain confidential information (such as exactly where fishers have been operating). This is especially important when there are very feww fishers involved in a fishery. So while such images may not be able to be displayed in meetings they remain useful for data exploration purposes.
+
+```{r sketchmap1, echo=TRUE, fig.wdith=7.fig.height=5.5,fig.align="center"}
+leftlong <- 143;  rightlong <- 150
+uplat <- -40;  downlat <- -44.6
+plotaus(leftlong,rightlong,uplat,downlat,gridon=1.0)
+addpoints(sps,intitle="Location of Catches")
+plotLand(incol="blue")
+
+```
+
+__Figure 6.__ A sketch map of the the Lat Long data within the _sps_ data set. There are clearly a number of points reported to be out oer the abyssal plain, but the majority of points define the range of the fishery.
+
+
+Rather than show individual points it is also possible, by using the function _plotpolys_, to aggragate catches into different geographical sub-divisions (e.g. 0.25 or 0.5 degree squares). If these are coloured relative to the density of total catches it then becomes apparent where most of the yield of a fishery derives from.
+
+
+```{r sketchmap2, echo=TRUE, fig.wdith=7.fig.height=5.5,fig.align="center"}
+leftlong <- 143;  rightlong <- 150
+uplat <- -40;  downlat <- -44.6
+plotaus(leftlong,rightlong,uplat,downlat,gridon=1.0)
+plotpolys(sps,leftlong,rightlong,uplat,downlat,gridon=0.2,leg="left",
+          intitle="0.2 degree squares",mincount=2)
+plotLand(incol="pink")
+
+```
+
+__Figure 7.__ A sketch map of the the Lat Long data within the _sps_ data set with catches aggregated into 0.2 degree squares. By requiring at least 2 records in each square before inclusion some of the deeper water extraneous records have been eliminated (although not all). The red, green, and roayl blue squares denote the areas generatig the greatest yields.
+
+
+Such sketch maps can be helpful, especially when plotting single year's of data to illustrate how the extent of a fishery varies through time. There are obvious limitations. There is no formal map projection, one merely alters the width and height of the plot until the visual representation of the land looks acceptable. In addition there are islands missing so as to limit the size of the underlying coastal definition data set (to see this try entering _head(cede:::aus,30)_ into the console).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

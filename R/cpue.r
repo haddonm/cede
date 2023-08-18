@@ -65,7 +65,7 @@ countgtzero <- function(invect) {
 #' @return a list with a similar structure to the out object, so not
 #'    a CEout class member but can be used with plotstand
 #' @export  dosingle
-dosingle <- function(inmodel,indat) {  # inmodel=mod; indat=sps2
+dosingle <- function(inmodel,indat) {  # inmodel=mod; indat=sps1
    ans <- lm(inmodel,data=indat)
    bits <- unlist(strsplit(as.character(inmodel)," "))
    modcoef <- summary(ans)$coefficients
@@ -157,19 +157,17 @@ geomean <- function(invect) {
 #'
 #' @return a matrix containing the parameters for invar
 #' @export getfact
-getfact <- function(inmat,invar) {  # inmat=model5; invar="Year"
+getfact <- function(inmat,invar) {  # inmat=modcoef; invar=bits[3]
    allowable <- c("matrix","CEout","lm","gam")
-   whatclass <- class(inmat)
-   if (length(whatclass) > 1) {
-      if ("gam" %in% whatclass) {
+   if (inherits(inmat,allowable)) {
+   whatclass <- class(inmat)[1]
+   if ("gam" %in% whatclass) {
          whatclass <- "gam"
-      } else {
-         if ("lm" %in% whatclass) {
-            whatclass <- "lm"
-         } else {
-            whatclass <- "no"
-         }
-      }
+    } else {
+     if ("lm" %in% whatclass) {
+        whatclass <- "lm"
+     }
+    }
    }
    if (whatclass %in% allowable) {
       if (whatclass == "matrix") pardat <- inmat
