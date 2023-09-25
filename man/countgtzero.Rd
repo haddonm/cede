@@ -18,7 +18,7 @@ countgtzero used in apply to count the number of zeros in a vector
 \examples{
 x <- rnorm(30,mean=1,sd=1)
 countgtzero(x)
-cat(30 - countgtzero(x),"out of ",30, " are less than 0  \\n")
+cat(30 - countgtzero(x),"out of ",30, " are less than 0  \n")
 y <- matrix(x,nrow=6,ncol=5)
 apply(y,1,countgtzero)
 }

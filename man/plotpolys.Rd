@@ -4,9 +4,22 @@
 \alias{plotpolys}
 \title{plotpolys - plots a grid and fills it with relative catches}
 \usage{
-plotpolys(intmp, leftlong, rightlong, uplat, downlat, leg = "topleft",
-  mincount = 1, intitle = " ", gridon = 0.1, hot = F, map = T,
-  scaler = NA, textout = TRUE, namecatch = "catch_kg")
+plotpolys(
+  intmp,
+  leftlong,
+  rightlong,
+  uplat,
+  downlat,
+  leg = "topleft",
+  mincount = 1,
+  intitle = " ",
+  gridon = 0.1,
+  hot = F,
+  map = T,
+  scaler = NA,
+  textout = TRUE,
+  namecatch = "catch_kg"
+)
 }
 \arguments{
 \item{intmp}{- a matrix or data.frame containing, at least, columns with the

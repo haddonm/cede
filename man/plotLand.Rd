@@ -4,8 +4,7 @@
 \alias{plotLand}
 \title{plotLand - puts land mass on top of a plot; covers land overlaps}
 \usage{
-plotLand(incol = "lightgrey", RGB = FALSE, green = NA, blue = NA,
-  alpha = NA)
+plotLand(incol = "lightgrey", RGB = FALSE, green = NA, blue = NA, alpha = NA)
 }
 \arguments{
 \item{incol}{defaults to "lightgrey" but can be any single number representing

@@ -161,8 +161,8 @@ Tables of numbers are very informative but sometimes it is much easier to gain a
 
 ```{r cebyyr, echo=TRUE, fig.width=7,fig.height=6,fig.align="center"}
 
-outH <- histyear(sps,Lbound=-1.75,Rbound=8.5,inc=0.25,pickvar="LnCE",
-                 years="Year",varlabel="log(CPUE)",plots=c(4,3))
+outH <- histyear(sps,xlimit=c(NA,NA,NA),pickvar="LnCE",years="Year",
+                 varlabel="log(CPUE)",plots=c(4,3))
 
 ```
 
@@ -171,8 +171,8 @@ __Figure 3.__ The distribution of the log(CPUE) each year for which data is avai
 
 ```{r depthbyyr, echo=TRUE, fig.width=7,fig.height=6,fig.align="center"}
 
-outH <- histyear(sps,Lbound=0,Rbound=375,inc=12.5,pickvar="Depth",
-                 years="Year",varlabel="Depth (m)",plots=c(4,3),vline=120)
+outH <- histyear(sps,xlimit=c(0,300,12.5),pickvar="Depth",years="Year",
+                 varlabel="Depth (m)",plots=c(4,3),vline=120)
 
 ```
 
@@ -182,7 +182,7 @@ __Figure 4.__ The distribution of reported mean depth of fishing each year. The 
 
 ```{r depthbyyr2, echo=TRUE, fig.width=7,fig.height=6,fig.align="center"}
 
-outH <- histyear(sps,Lbound=0,Rbound=10,inc=0.25,pickvar="Effort",
+outH <- histyear(sps,xlimit=c(0,8,0.25),pickvar="Effort",
                  years="Year",varlabel="Effort ('000s Hrs)",plots=c(4,3),
                  vline=NA)
 

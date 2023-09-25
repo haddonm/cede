@@ -4,7 +4,8 @@
 \name{sps}
 \alias{sps}
 \title{sps - a 11603 x 10 data.frame for testing cpue and mapping functions}
-\format{A data frame with 10603 x 10 variables:
+\format{
+A data frame with 10603 x 10 variables:
 \itemize{
   \item{Year}{The year in which fishing takes place}
   \item{Month}{The month in which fishing took place}
@@ -17,7 +18,8 @@
      M = mixed}
   \item{Effort}{the hours trawled}
   \item{Zone}{The fished area split into three latitudinal zones}
-}}
+}
+}
 \description{
 sps - a 11603 x 10 data.frame for testing CPUE functions
    containing simulated trawl shot CPUE data for the years 2003 - 2014,

@@ -4,9 +4,16 @@
 \alias{plotaus}
 \title{plotaus sets up a schematic map outline of the SESSF}
 \usage{
-plotaus(leftlong = 129, rightlong = 155, uplat = -25,
-  downlat = -44.6, defineplot = T, gridon = 0, maintitle = "",
-  infont = 7)
+plotaus(
+  leftlong = 129,
+  rightlong = 155,
+  uplat = -25,
+  downlat = -44.6,
+  defineplot = T,
+  gridon = 0,
+  maintitle = "",
+  infont = 7
+)
 }
 \arguments{
 \item{leftlong}{the longitude of the left hand side of the box plotted;

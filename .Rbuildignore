@@ -4,4 +4,4 @@
 ^\.Rproj\.user$
 ^README.md$
 ^\.git$
-^*.tar.gz$
+^.*.tar.gz$

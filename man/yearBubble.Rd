@@ -4,9 +4,19 @@
 \alias{yearBubble}
 \title{yearBubble: Generates a bubbleplot of x against Year.}
 \usage{
-yearBubble(x, xlabel = "", ylabel = "", diam = 0.1, vline = NA,
-  txt = c(4, 6, 9, 11), Fyear = FALSE, xaxis = TRUE, yaxis = TRUE,
-  hline = FALSE, nozero = FALSE)
+yearBubble(
+  x,
+  xlabel = "",
+  ylabel = "",
+  diam = 0.1,
+  vline = NA,
+  txt = c(4, 6, 9, 11),
+  Fyear = FALSE,
+  xaxis = TRUE,
+  yaxis = TRUE,
+  hline = FALSE,
+  nozero = FALSE
+)
 }
 \arguments{
 \item{x}{- a matrix of variable * Year; although it needn't be year}

@@ -3,7 +3,6 @@
 \docType{package}
 \name{cede}
 \alias{cede}
-\alias{cede-package}
 \title{cede a set of functions to assist working with Fisheries data}
 \description{
 The cede package provides a set of functions to

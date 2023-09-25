@@ -4,9 +4,20 @@
 \alias{addpoints}
 \title{addpoints includes a set of points with a set size and symbol}
 \usage{
-addpoints(indat, inpch = 20, incex = 0.2, incol = 2, intitle = "",
-  jit = F, wobble = 1, refill = T, Long = "Long", Lat = "Lat",
-  txtout = TRUE, namecatch = "catch_kg")
+addpoints(
+  indat,
+  inpch = 20,
+  incex = 0.2,
+  incol = 2,
+  intitle = "",
+  jit = F,
+  wobble = 1,
+  refill = T,
+  Long = "Long",
+  Lat = "Lat",
+  txtout = TRUE,
+  namecatch = "catch_kg"
+)
 }
 \arguments{
 \item{indat}{a matrix or data.frame containing, at least, columns with the

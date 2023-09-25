@@ -4,8 +4,15 @@
 \alias{qqdiag}
 \title{qqdiag generates a qqplot with a histogram of residuals}
 \usage{
-qqdiag(inmodel, plotrug = FALSE, bins = NA, hline = 0, xinc = 100,
-  yinc = 1, ylab = "residuals")
+qqdiag(
+  inmodel,
+  plotrug = FALSE,
+  bins = NA,
+  hline = 0,
+  xinc = 100,
+  yinc = 1,
+  ylab = "residuals"
+)
 }
 \arguments{
 \item{inmodel}{the optimum model being considered}

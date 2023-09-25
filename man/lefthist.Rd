@@ -4,10 +4,23 @@
 \alias{lefthist}
 \title{lefthist draws a histogram up the y-axis}
 \usage{
-lefthist(x, bins = 25, mult = 1.025, col = 2, lwd = 1,
-  width = 0.9, border = 1, xinc = 1, yinc = NA, title = "",
-  xlabel = "Frequency", ylabel = "", cex = 1, textout = FALSE,
-  hline = NA)
+lefthist(
+  x,
+  bins = 25,
+  mult = 1.025,
+  col = 2,
+  lwd = 1,
+  width = 0.9,
+  border = 1,
+  xinc = 1,
+  yinc = NA,
+  title = "",
+  xlabel = "Frequency",
+  ylabel = "",
+  cex = 1,
+  textout = FALSE,
+  hline = NA
+)
 }
 \arguments{
 \item{x}{a vector of the data to be plotted}

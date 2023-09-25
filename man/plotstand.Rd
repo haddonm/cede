@@ -4,8 +4,7 @@
 \alias{plotstand}
 \title{plotstand - plot optimum model from standLM  vs Geometric mean}
 \usage{
-plotstand(stnd, bars = FALSE, geo = 0, P = 95, catch = NA,
-  usefont = 7)
+plotstand(stnd, bars = FALSE, geo = 0, P = 95, catch = NA, usefont = 7)
 }
 \arguments{
 \item{stnd}{is the list output from standLM}

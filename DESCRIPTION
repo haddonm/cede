@@ -1,8 +1,8 @@
 Package: cede
 Type: Package
 Title: Functions for Fishery Data Exploration and CPUE Standardization
-Version: 0.0.7
-Date: 2023-08-18
+Version: 0.0.8
+Date: 2023-09-25
 Author: Malcolm Haddon
 Maintainer: Malcolm Haddon <Malcolm.Haddon@gmail.com>
 Description: Facilitates the exploration of variation and patterns within 
@@ -16,7 +16,7 @@ Description: Facilitates the exploration of variation and patterns within
     Version 0.0.5 alters plotLand to include the option of using rgb colours.
     This would allow for transparency in case you want to illustrate 
     distributions on land or in rivers.
-Depends: R (>= 2.10)
+Depends: R (>= 3.10)
 Imports: 
     gamm4,
     mgcv,
@@ -24,7 +24,7 @@ Imports:
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: TRUE
-RoxygenNote: 6.1.1
+RoxygenNote: 7.2.3
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr

@@ -4,32 +4,45 @@
 \alias{histyear}
 \title{histyear plots a histogram of a given variable for each year available}
 \usage{
-histyear(x, Lbound = -3.5, Rbound = 12.25, inc = 0.25,
-  pickvar = "LnCE", years = "Year", varlabel = "log(CPUE)",
-  vline = NA, plots = c(3, 3))
+histyear(
+  x,
+  xlimit = c(NA, NA, NA),
+  pickvar = "cpue",
+  years = "year",
+  varlabel = "CPUE",
+  vline = NA,
+  plots = c(5, 5),
+  normadd = TRUE,
+  left = TRUE
+)
 }
 \arguments{
 \item{x}{the data.frame of data with at least a 'Year' and pickvar present}
 
-\item{Lbound}{leftbound on all histograms, defaults to -3.5}
+\item{xlimit}{the xaxis bounds for all histograms, defaults to c(NA,NA,NA),
+the values would be as used in seq(xlimit[1],xlimit[2],xlimit[3]). If the
+default is used then the 0 and 0.98 quantiles of the variable are used as
+the bounds with 25 bins}
 
-\item{Rbound}{right bound on all histograms, defaults to 12.25}
+\item{pickvar}{which variable to plot each year default = 'cpue'}
 
-\item{inc}{the class width of the histogram, defaults to 0.25}
+\item{years}{which variable name identifies the yaer column, default='year'}
 
-\item{pickvar}{which variable to plot each year default = 'LnCE'}
-
-\item{years}{which variable name identifies the yaer column, default='Year'}
-
-\item{varlabel}{what label to use on x-axis, default = 'log(CPUE)'}
+\item{varlabel}{what label to use on x-axis, default = 'CPUE'}
 
 \item{vline}{an optional vertical line to aid interpretation. If it is
 numeric it will be added to each plot}
 
-\item{plots}{how many plots to generate, default = c(3,3)}
+\item{plots}{how many plots to generate, default = c(5,5)}
+
+\item{normadd}{should a normal distribution be added to each plot. 
+default=TRUE}
+
+\item{left}{on which side of each plot should the year and number of records 
+be placed left=TRUE is the default. left=FALSE will place text on right}
 }
 \value{
-a matrix of the year, mean value, stdev, and N number of
+invisibly, a matrix of the year, mean value, stdev, and N number of
     observations. It also plots a histogram for each year and fits a
     normal distribution to each one.
 }
@@ -40,5 +53,7 @@ histyear plots a histogram of a given variable for each year
 \examples{
 \dontrun{
 print("still to be developed")
+# pickvar="x100nethr";years="year";varlabel="log(CPUE)";vline=NA;plots=plotnum;
+# normadd=TRUE;left=FALSE;xlimit=c(0,250,10)
 }
 }

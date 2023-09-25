@@ -1,18 +1,21 @@
 
-#' @title addnorm - adds a normal distribution to a histogram of a data set.
+#' @title addnorm adds a normal distribution to a histogram of a data set.
 #'
-#' @description  addnorm - adds a normal distribution to a histogram of a data
+#' @description  addnorm adds a normal distribution to a histogram of a data
 #'    set. This is generally to be used to illustrate whether log-transformation
 #'    normalizes a set of catch or cpue data.
-#' @param inhist - is the output from a call to 'hist' (see examples)
-#' @param xdata -  is the data that is being plotted in the histogram.
-#' @param inc - defaults to a value of 0.01; is the fine grain increment used to
+#'
+#' @param inhist is the output from a call to 'hist' (see examples)
+#' @param xdata is the data that is being plotted in the histogram.
+#' @param inc defaults to a value of 0.01; is the fine grain increment used to
 #'    define the normal curve. The histogram will be coarse grained relative to
 #'    this.
+#'
 #' @return a list with a vector of 'x' values and a vector of 'y' values (to be
 #'    used to plot the fitted normal probability density function), and a vector
-#'    used two called 'stats' containing the mean and sandard deviation of the
-#'    input data
+#'    of four called 'stats' containing the mean, standard deviation, number of
+#'    observations and median of the input data
+#'    
 #' @export addnorm
 #' @examples
 #' x <- rnorm(1000,mean=5,sd=1)
@@ -24,15 +27,17 @@
 #' lines(nline$x,nline$y,lwd=3,col=2)
 #' print(nline$stats)
 addnorm <- function(inhist,xdata,inc=0.01) {
-   lower <- inhist$breaks[1]
-   upper <- tail(inhist$breaks,1)
-   cw <- inhist$breaks[2]-inhist$breaks[1]
-   x <- seq(lower,upper, inc) #+ (cw/2)
-   avCE <- mean(xdata,na.rm=TRUE)
-   sdCE <- sd(xdata,na.rm=TRUE)
-   N <- length(xdata)
-   ans <- list(x=x,y=(N*cw)*dnorm(x,avCE,sdCE),stats=c(avCE,sdCE,N))
-   return(ans)
+  lower <- inhist$breaks[1]
+  upper <- tail(inhist$breaks,1)
+  cw <- inhist$breaks[2]-inhist$breaks[1]
+  x <- seq(lower,upper, inc) #+ (cw/2)
+  avCE <- mean(xdata,na.rm=TRUE)
+  sdCE <- sd(xdata,na.rm=TRUE)
+  N <- length(xdata)
+  med <- median(xdata,na.rm=TRUE)
+  ans <- list(x=x,y=(N*cw)*dnorm(x,avCE,sdCE),
+              stats=c(mean=avCE,stdev=sdCE,N=N,median=med))
+  return(ans)
 } # end of addnorm
 
 #' @title countgtzero used in apply to count the number of zeros in a vector
@@ -110,10 +115,10 @@ dosingle <- function(inmodel,indat) {  # inmodel=mod; indat=sps1
 #'  facttonum(x)
 #' }
 facttonum <- function(invect){
-   if (class(invect) == "factor") {
+   if (inherits(invect,"factor")) {
       outvect <- suppressWarnings(as.numeric(levels(invect))[invect])
    }
-   if (class(invect) == "numeric") outvect <- invect
+   if (inherits(invect,"numeric")) outvect <- invect
    if (any(is.na(outvect)))
       warning("NAs produced, your input vector may have non-numbers present \n")
    return(outvect)
@@ -222,23 +227,29 @@ getfact <- function(inmat,invar) {  # inmat=modcoef; invar=bits[3]
 } # end of getfact
 
 
+
 #' @title histyear plots a histogram of a given variable for each year available
 #'
 #' @description histyear plots a histogram of a given variable for each year
 #'     available
 #'
 #' @param x the data.frame of data with at least a 'Year' and pickvar present
-#' @param Lbound leftbound on all histograms, defaults to -3.5
-#' @param Rbound right bound on all histograms, defaults to 12.25
-#' @param inc  the class width of the histogram, defaults to 0.25
-#' @param pickvar which variable to plot each year default = 'LnCE'
-#' @param years which variable name identifies the yaer column, default='Year'
-#' @param varlabel what label to use on x-axis, default = 'log(CPUE)'
+#' @param xlimit the xaxis bounds for all histograms, defaults to c(NA,NA,NA),
+#'     the values would be as used in seq(xlimit[1],xlimit[2],xlimit[3]). If the
+#'     default is used then the 0 and 0.98 quantiles of the variable are used as
+#'     the bounds with 25 bins
+#' @param pickvar which variable to plot each year default = 'cpue'
+#' @param years which variable name identifies the yaer column, default='year'
+#' @param varlabel what label to use on x-axis, default = 'CPUE'
 #' @param vline an optional vertical line to aid interpretation. If it is
 #'     numeric it will be added to each plot
-#' @param plots how many plots to generate, default = c(3,3)
+#' @param plots how many plots to generate, default = c(5,5)
+#' @param normadd should a normal distribution be added to each plot. 
+#'     default=TRUE
+#' @param left on which side of each plot should the year and number of records 
+#'     be placed left=TRUE is the default. left=FALSE will place text on right
 #'
-#' @return a matrix of the year, mean value, stdev, and N number of
+#' @return invisibly, a matrix of the year, mean value, stdev, and N number of
 #'     observations. It also plots a histogram for each year and fits a
 #'     normal distribution to each one.
 #' @export
@@ -246,33 +257,43 @@ getfact <- function(inmat,invar) {  # inmat=modcoef; invar=bits[3]
 #' @examples
 #' \dontrun{
 #' print("still to be developed")
+#' # pickvar="x100nethr";years="year";varlabel="log(CPUE)";vline=NA;plots=plotnum;
+#' # normadd=TRUE;left=FALSE;xlimit=c(0,250,10)
 #' }
-histyear <- function(x,Lbound=-3.5,Rbound=12.25,inc=0.25,
-                     pickvar="LnCE",years="Year",varlabel="log(CPUE)",
-                     vline=NA,plots=c(3,3)) {
-   yrs <- sort(unique(x[,years]))
-   nyr <- length(yrs)
-   columns <- c("Year","maxcount","Mean","StDev","N","Min","Max")
-   results <- matrix(0,nrow=nyr,ncol=length(columns),dimnames=list(yrs,columns))
-   par(mfcol=plots,mai=c(0.25,0.25,0.05,0.05),oma=c(1.2,1.0,0.0,0.0))
-   par(cex=0.75, mgp=c(1.35,0.35,0), font.axis=7,font=7,font.lab=7)
-   for (yr in 1:nyr) {
-      pick <- which(x[,years] == yrs[yr])
-      outh <- hist(x[pick,pickvar],breaks=seq(Lbound,Rbound,inc),col=2,main="",xlab="",ylab="")
-      mtext(paste0("  ",yrs[yr]),side=3,outer=F,line=-2,font=7,cex=0.9,adj=0)
-      mtext(paste0("  ",length(pick)),side=3,outer=F,line=-3,font=7,cex=0.9,adj=0)
-      if (is.numeric(vline)) abline(v=vline,col=4,lwd=2)
-      if (pickvar != "catch_kg") {
-         pickmax <- which.max(outh$counts)
-         ans <- addnorm(outh,x[pick,pickvar])
-         lines(ans$x,ans$y,col=3,lwd=2)
-         results[yr,] <- c(yrs[yr],outh$mids[pickmax],ans$stats,
-                           range(x[pick,pickvar],na.rm=TRUE))
-      }
-   }
-   mtext("Frequency",side=2,outer=T,line=0.0,font=7,cex=1.0)
-   mtext(varlabel,side=1,outer=T,line=0.0,font=7,cex=1.0)
-   return(results)
+histyear <- function(x,xlimit=c(NA,NA,NA),
+                     pickvar="cpue",years="year",varlabel="CPUE",
+                     vline=NA,plots=c(5,5),normadd=TRUE,left=TRUE) {
+  yrs <- sort(unique(x[,years]))
+  nyr <- length(yrs)
+  columns <- c("Year","maxcount","Mean","StDev","N","Median","Min","Max")
+  results <- matrix(0,nrow=nyr,ncol=length(columns),dimnames=list(yrs,columns))
+  par(mfcol=plots,mai=c(0.25,0.25,0.05,0.05),oma=c(1.2,1.0,0.0,0.0))
+  par(cex=0.75, mgp=c(1.35,0.35,0), font.axis=7,font=7,font.lab=7)
+  if (left) adj=0 else adj=1
+  if (is.na(xlimit[1])) {
+    xlimit[1:2] <- quantile(x[,pickvar],probs=c(0,0.99))
+    bins <- seq(xlimit[1],xlimit[2],length=25)
+  } else { bins <- seq(xlimit[1],xlimit[2],xlimit[3]) }
+  pickX <- which((x[,pickvar] >= xlimit[1]) &
+                   (x[,pickvar] <= xlimit[2]))
+  x2 <- droplevels(x[pickX,])
+  for (yr in 1:nyr) {
+    pick <- which(x2[,years] == yrs[yr])
+    outh <- hist(x2[pick,pickvar],breaks=bins,col=2,main="",xlab="",ylab="")
+    mtext(paste0("  ",yrs[yr]),side=3,outer=F,line=-2,font=7,cex=0.9,adj=adj)
+    mtext(paste0("  ",length(pick)),side=3,outer=F,line=-3,font=7,cex=0.9,adj=adj)
+    if (is.numeric(vline)) abline(v=vline,col=4,lwd=2)
+    if (normadd) {
+      pickmax <- which.max(outh$counts)
+      ans <- addnorm(outh,x[pick,pickvar])
+      lines(ans$x,ans$y,col=3,lwd=2)
+      results[yr,] <- c(yrs[yr],outh$mids[pickmax],ans$stats,
+                        range(x2[pick,pickvar],na.rm=TRUE))
+    }
+  }
+  mtext("Frequency",side=2,outer=T,line=0.0,font=7,cex=1.0)
+  mtext(varlabel,side=1,outer=T,line=0.0,font=7,cex=1.0)
+  return(invisible(results))
 } # end of histyear
 
 #' @title lefthist draws a histogram up the y-axis

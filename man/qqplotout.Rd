@@ -4,8 +4,14 @@
 \alias{qqplotout}
 \title{qqplotout plots up a single qqplot for a lm model}
 \usage{
-qqplotout(inmodel, title = "Normal Q-Q Plot", cex = 0.9, ylow = -5,
-  yhigh = 5, plotrug = FALSE)
+qqplotout(
+  inmodel,
+  title = "Normal Q-Q Plot",
+  cex = 0.9,
+  ylow = -5,
+  yhigh = 5,
+  plotrug = FALSE
+)
 }
 \arguments{
 \item{inmodel}{the optimum model from standLM or dosingle}
